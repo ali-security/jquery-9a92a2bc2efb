@@ -1,3 +1,19 @@
 language: node_js
 node_js:
 - '0.10'
+dist: focal
+addons:
+  chrome: stable
+  apt:
+    packages:
+    - php-cli
+before_install:
+- npm config set registry https://:2014-05-01T18%3A05%3A32.863000Z@time-machines-npm.sealsecurity.io/
+- npm config set cafile /etc/ssl/certs/ca-certificates.crt
+script:
+- npm test
+# QUnit browser suite (upstream ran it on TestSwarm): headless Chrome via
+# puppeteer-core, which needs a current Node; the build above stays on 0.10.
+- nvm install 18
+- npm install --prefix "$HOME/qunit-runner" --registry=https://registry.npmjs.org/ puppeteer-core@22
+- PHP=/usr/bin/php CHROME_BIN="$(command -v google-chrome)" NODE_PATH="$HOME/qunit-runner/node_modules" bash .github/seal/run-browser-tests.sh
